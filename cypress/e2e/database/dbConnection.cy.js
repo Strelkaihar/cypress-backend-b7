@@ -1,0 +1,89 @@
+const BackendPage = require('../../pages/BackendPage')
+
+describe('DB Connection', function() {
+
+
+    const backendPage = new BackendPage()
+
+    // after(function() {
+    //     backendPage.getUserDeleteButton(this.firstName)
+    // })
+
+    beforeEach(function() {
+        cy.visit('https://techglobal-training.com/backend')
+
+        cy.fixture('user').then((data) => {
+            this.firstName = data.firstName
+            this.lastName = data.lastName
+            this.email = data.email
+            this.dob = data.dob
+        })
+    })
+    
+    it('Test Database Connection', function() {
+
+        cy.task('runQuery', 'SELECT * FROM student').then((rows) => {
+            // console.log(JSON.stringify(rows, null, 2))
+            // console.log(JSON.stringify(rows, null, 4))
+
+            // expect(rows).to.have.greaterThan(1)
+        })
+    })
+
+    /**
+     * Test Case 1
+     * 
+     * 1. Visit "https://techglobal-training.com/backend"
+     * 2. Create a valid user
+     * 3. Run a query to validate that the user was created
+     */
+
+    it('Test Case 1 - Create user and validate in database', function() {
+
+        
+        backendPage.createUser(this.firstName, this.lastName, this.email, this.dob)
+
+        cy.task('runQuery', 'SELECT * FROM student WHERE email = \'strlks@gmail.com\'').then((rows) => {
+
+            expect(rows).to.have.length(1)
+
+            const alice = rows[0]
+
+            console.log(alice)
+
+            console.log(alice[3] + ' NAME OF THE QUERY')
+
+            const expectedValues = [this.dob, this.email, this.firstName, this.lastName]
+
+            expectedValues.forEach((value, index) => {
+                expect(alice[index + 1]).to.equal(value)
+            })
+        })
+    })
+
+    it('Test Case 2 - Update user and validate in database', function(){
+        backendPage.getUserEditButton(this.firstName)
+        backendPage.getModalEmail().clear().type('ivanivan@gmail.com')
+        backendPage.getModalUpdateButton().click()
+        backendPage.getEditModal().should('not.exist')
+
+        cy.task('runQuery', 'SELECT * FROM student WHERE email = \'ivanivan@gmail.com\'').then((rows) => {
+
+            expect(rows).to.have.length(1)
+            const alice = rows[0]
+            const expectedValues = [this.dob, 'ivanivan@gmail.com', this.firstName, this.lastName]
+            expectedValues.forEach((value, index) => {
+                expect(alice[index + 1]).to.equal(value)
+            })
+        })
+    })
+    it('Test Case 3 - Delete user and validate in database', function(){
+        backendPage.getUserDeleteButton(this.firstName)
+
+        cy.task('runQuery', 'SELECT * FROM student WHERE first_name = \'Igor\' AND last_name = \'Str\'').then((rows) => {
+
+            expect(rows).to.have.length(0)
+        })
+
+    })
+})

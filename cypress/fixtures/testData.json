@@ -1,0 +1,15 @@
+{
+    "postRequestBody" : {
+    "firstName": "IVAN",
+    "lastName": "BALI",
+    "email": "Nettieasda7@example.net",
+    "dob": "2022-11-05"
+    },
+    "putRequestBody" : {
+        "firstName": "IVANupdated",
+        "lastName": "BALIupdated",
+        "email": "Nettieasdaupdated7@example.net",
+        "dob": "2011-11-05"
+    }
+
+}
